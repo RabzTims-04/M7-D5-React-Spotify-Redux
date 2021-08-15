@@ -1,6 +1,10 @@
-import { Component } from 'react'
+import React,{ Component, createRef } from 'react'
 import { Button } from 'react-bootstrap'
+import { connect } from 'react-redux'
+
 class Audio extends Component{
+    
+    refs = createRef()
 
     state={
         track:''
@@ -14,17 +18,18 @@ class Audio extends Component{
 
      componentDidUpdate =(prevProps)=>{
         console.log(prevProps);
-       if(this.state.track !== this.props.track){           
+       if(this.state.track !== this.props.currentSong.song?.preview){           
            this.fetchTrack()
        }      
         console.log(this.state.track);
      
     } 
+    
 
     fetchTrack =()=>{
-        if(this.props.track){
+        if(this.props.currentSong.song.preview){
             this.setState({
-                track:this.props.track
+                track:this.props.currentSong.song.preview
             },()=>{
                 this.refs.audio.pause()
                 this.refs.audio.load()
@@ -32,7 +37,7 @@ class Audio extends Component{
             })
         }
 
-    }
+    } 
 
     render(){
 
@@ -44,14 +49,15 @@ class Audio extends Component{
 
                 </Button>
             </div> */
+    
+       /*  <AudioPlayer src={this.state.track} /> */
+    
+         <audio src={this.state.track} preload="metadata" ref='audio'>
 
-        <audio controls autoPlay ref='audio'>
-             <source src={this.state.track} type="audio/mpeg"/>
-             not compatible
-        </audio>
+        </audio> 
 
         )
     }
 }
  
-export default Audio;
+export default connect(s=>s)(Audio);

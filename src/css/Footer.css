@@ -8,6 +8,31 @@
     z-index: 10;
 }
 
+.play-pause-btn{
+    background-color: transparent;
+    border-color:transparent;
+}
+
+.play-pause-btn:hover{
+    background-color: transparent;
+    border-color:transparent;
+}
+
+.play-pause-btn:focus-visible{
+    background-color: transparent;
+    border-color:transparent;
+}
+
+.play-pause-btn:focus{
+    background-color: transparent;
+    border-color:transparent;
+}
+
+.play-pause-btn:active{
+    background-color: transparent;
+    border-color:transparent;
+}
+
 #player svg{
     color: #7a7a7a;
 }
@@ -95,7 +120,6 @@ input{
   }
 
 #seek-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; 
-    appearance: none;
+    
     cursor: pointer; 
   }

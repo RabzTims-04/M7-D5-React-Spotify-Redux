@@ -1,11 +1,83 @@
-import { Component } from 'react';
+import { Component, createRef } from 'react';
 import '../css/Footer.css'
 import { withRouter } from 'react-router-dom'
-import { Container, Row, Col } from 'react-bootstrap'
+import { Container, Row, Col, Button } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStepBackward,faStepForward,faPlayCircle,faAlignJustify, faDesktop, faVolumeUp, faHeart } from '@fortawesome/free-solid-svg-icons'
+import { faStepBackward,faStepForward,faAlignJustify, faDesktop, faVolumeUp } from '@fortawesome/free-solid-svg-icons'
+import { AiFillPauseCircle, AiFillPlayCircle, AiOutlineHeart, AiFillHeart } from "react-icons/ai"
+import { connect } from 'react-redux';
+import { addToFavouritesAction, removeFromFavouritesAction, songIsPlayingAction } from '../redux/actions/actions';
 
+const mapStateToProps = (state) => state
+
+const mapDispatchToProps = (dispatch) => ({
+    isPlaying: (boolean) => dispatch(songIsPlayingAction(boolean)),
+    addToFavourites: (song) => dispatch(addToFavouritesAction(song)),
+    removeFromFavourites: (song) => dispatch(removeFromFavouritesAction(song))
+})
 class Footer extends Component {
+
+    audioPlayer = createRef()
+    progressBar = createRef()
+    animationRef = createRef()
+
+    state={
+        duration:0,
+        currentTime: 0
+    }
+
+    calculateTime = (secs) => {
+        const minutes = Math.floor(secs / 60);
+        const returnedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+        const seconds = Math.floor(secs % 60);
+        const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+        return `${returnedMinutes}:${returnedSeconds}`;
+      }
+
+    togglePlayPause = () => {
+       const prevValue = this.props.currentSong.isPlaying;
+        this.props.isPlaying(!prevValue); 
+        if (!prevValue) {
+          this.audioPlayer?.current?.play();
+          this.animationRef.current = requestAnimationFrame(this.whilePlaying)
+          console.log(this.audioPlayer?.current?.play());
+        } else {
+          this.audioPlayer.current?.pause();
+         cancelAnimationFrame(this.animationRef.current)
+        }
+      }
+
+      whilePlaying = () => {
+          if(this.progressBar.current && this.audioPlayer.current){
+        this.progressBar.current.value = this.audioPlayer.current.currentTime;
+      }
+        this.changePlayerCurrentTime();
+        this.animationRef.current = requestAnimationFrame(this.whilePlaying);
+      }
+
+      changeRange = () => {
+          if(this.audioPlayer.current && this.progressBar.current)
+        this.audioPlayer.current.currentTime = this.progressBar.current.value;
+        this.changePlayerCurrentTime();
+      }
+
+      changePlayerCurrentTime = () => {
+        this.progressBar.current?.style.setProperty('--seek-before-width', `${this.progressBar.current.value / this.state.duration * 100}%`)
+        this.setState({
+            ...this.state,
+            currentTime: this.progressBar.current?.value
+        })
+      }
+
+      backTen = () => {
+        this.progressBar.current.value = Number(this.progressBar.current.value - 1);
+        this.changeRange();
+      }
+    
+      forwardTen = () => {
+        this.progressBar.current.value = Number(this.progressBar.current.value + 1);
+        this.changeRange();
+      }
 
     render() {
         return (
@@ -23,14 +95,22 @@ class Footer extends Component {
                               
                           </Col>
                           :<Col className="d-flex py-2 pl-4">
-
-                                <img src={this.props.pic} className="img-fluid" alt="artistname"/>
+                              <audio src={this.props.currentSong.song?.preview} preload="metadata"  ref={this.audioPlayer}></audio> 
+                                <img src={`https://cdns-images.dzcdn.net/images/cover/${this.props.currentSong.song?.md5_image}/350x350.jpg`} className="img-fluid" alt="artistname"/>
                                 <div className="flex-column pl-3 text-left mt-3 footerp">
                                 <p><strong>My Favourite Song</strong></p>            
-                                <p className="text-muted">{this.props.title}</p>
+                                <p className="text-muted">{this.props.currentSong.song?.title_short}</p>
                                 </div>
-                                <FontAwesomeIcon icon={faHeart} className="ml-3 mt-4"/>
-                                <svg style={{overflow:'visible'}} className="pl-3 mt-4" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor" fill-rule="evenodd"><path d="M1 3v9h14V3H1zm0-1h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill-rule="nonzero"></path><path d="M10 8h4v3h-4z"></path></g></svg>
+                                {
+                                    (this.props.favourites.songs.findIndex(song => song.id === this.props.currentSong.song.id) !== -1 )
+                                    ?<AiFillHeart 
+                                    onClick={() => this.props.removeFromFavourites(this.props.currentSong.song && this.props.currentSong.song)}
+                                    className="ml-3 mt-2" />
+                                    :<AiOutlineHeart 
+                                    onClick={() => this.props.addToFavourites(this.props.currentSong.song && this.props.currentSong.song)}
+                                    className="ml-3 mt-2" />
+                                }
+                                <svg style={{overflow:'visible'}} className="pl-3 mt-2" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor" fill-rule="evenodd"><path d="M1 3v9h14V3H1zm0-1h14a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill-rule="nonzero"></path><path d="M10 8h4v3h-4z"></path></g></svg>
 
                             </Col>
                         }
@@ -56,14 +136,18 @@ class Footer extends Component {
                                 </svg>
 
                                {/*  Back */}
-                                <FontAwesomeIcon icon={faStepBackward} className="mx-4 mb-1" />
+                                <FontAwesomeIcon onClick={this.backTen} icon={faStepBackward} className="mx-4 mb-1" />
 
                                {/* Play */}
-                               
-                                <FontAwesomeIcon icon={faPlayCircle} className="play-pause" size="2x" />
+                              <Button className="play-pause-btn" onClick={ this.togglePlayPause}>
+                               {this.props.currentSong.isPlaying
+                               ?<AiFillPauseCircle style={{width:"40px", height:"40px"}}/>
+                               :<AiFillPlayCircle style={{width:"40px", height:"40px"}}/>
+                               }                               
+                               </Button>
 
                                 {/*  next */}
-                                <FontAwesomeIcon icon={faStepForward} className="mx-3  mb-1" />
+                                <FontAwesomeIcon onClick={this.forwardTen} icon={faStepForward} className="mx-3  mb-1" />
 
                                {/*  repeat*/}
                                 <svg
@@ -85,9 +169,9 @@ class Footer extends Component {
 
                                 <div class="row justify-content-center text-muted">
                                     <div class="col-12">
-                                        <span id="current-time" class="time">0:00</span>
-                                        <input type="range" id="seek-slider" max="100" value="0"/>
-                                        <span id="duration" class="time">0:00</span>
+                                        <span id="current-time" class="time">{this.calculateTime(this.state.currentTime)}</span>
+                                        <input onChange={this.changeRange} type="range" id="seek-slider" ref={this.progressBar} defaultValue="0"/>
+                                        <span id="duration" class="time">{this.audioPlayer?.current?.duration ? this.calculateTime(this.audioPlayer?.current?.duration): "00:00"}</span>
                                     </div>
                                 </div>
 
@@ -115,4 +199,4 @@ class Footer extends Component {
     }
 }
 
-export default withRouter(Footer)
+export default connect(mapStateToProps,mapDispatchToProps)(withRouter(Footer))

@@ -4,31 +4,51 @@ import MyNav from './MyNav';
 import Footer from './Footer'
 import { Link } from 'react-router-dom'
 import '../css/Home.css'
+import { connect } from 'react-redux';
 
 class Home extends Component {
 
      state={
-        albums:[],
         search:'',
-        searchArtist:''
+        searchArtist:'',
+        rockSongs: [],
+        popSongs: [],
+        hipHopSongs: []
     } 
 
-    componentDidMount =()=>{
+    
+    rockArtists = [
+        "queen",
+        "u2",
+        "thepolice",
+        "eagles",
+        "thedoors",
+        "oasis"
+      ];
 
-        const artists = [
-            'Eminem', 'Queen', 'Ed sheeran', 'The Beatles', 
-            'Back street boys','Justin Bieber','Micheal Jackson',
-            'Justin Timberlake', 'Enrique', 'Lady Gaga', 'Ariana Grande', 
-            'Bruno Mars', 'Atif', 'Rahat Fateh', 'Farhan Saeed'
-        ]
+      popArtists = [
+        "ariana",
+        "maroon",
+        "onerepublic",
+        "coldplay",
+        "katyperry",
+      ];
+
+      hipHopArtists = ["eminem", "snoopdogg", "lilwayne", "drake"];
+
+    componentDidMount = async ()=>{
         
-        artists.map(artist => this.fetchAlbum(artist))       
+        await this.rockArtists.map(rock => this.fetchAlbum(rock, "rockSongs"))
+        await this.popArtists.map(pop => this.fetchAlbum(pop, "popSongs"))
+        await this.hipHopArtists.map(hiphop => this.fetchAlbum(hiphop, "hipHopSongs"))
+
+        console.log(this.state.popSongs);
     }
 
      componentDidUpdate = (prevProps)=>{
          console.log(prevProps);
          if(this.state.search.length>0){
-            this.fetchSearch() 
+            this.fetchSearch("rockSongs") 
          }
        
     } 
@@ -42,37 +62,30 @@ class Home extends Component {
         }       
     }
 
-    fetchSearch = async()=>{
-        const url=(this.state.search.length>0?('https://striveschool-api.herokuapp.com/api/deezer/search?q='+ this.state.search):'')
-        const response = await fetch(url)
-        const data = await response.json()
-        const searchArtist = await data.data[0]
-        console.log(searchArtist);
-        if(response.ok){
-            this.setState({
-                ...this.state,
-                searchArtist:searchArtist
-            })
-        }
+    currentDay = () => {
+        let today = new Date()
+        let currentDay = today.getDay()
+        let daylist = ["Sunday","Monday","Tuesday","Wednesday ","Thursday","Friday","Saturday"];
+        return daylist[currentDay]
     }
 
-    fetchAlbum = async (artist)=>{
+    fetchAlbum = async (artist, category)=>{
 
         try {
-            const url= `https://striveschool-api.herokuapp.com/api/deezer/search?q=` + artist
+            const url= `https://striveschool-api.herokuapp.com/api/deezer/search?q=${artist}`
             const response = await fetch(url)
             const data = await response.json()
             const artistpic = await data.data[0]
             console.log(data.data);
             console.log(artistpic);
-            console.log(this.state.albums);
             if(response.ok){
                  this.setState({
-                    ...this.state,
-                    
-                    albums: [...this.state.albums, artistpic]
+                    ...this.state,                    
+                    [category]:[...this.state[category], artistpic]
                 }) 
-                console.log(this.state.albums);
+                console.log(this.state.rockSongs);
+                console.log(this.state.popSongs);
+                console.log(this.state.hipHopSongs);
             }
             else{
                 console.log('notfound');
@@ -135,18 +148,24 @@ class Home extends Component {
                      {/* Cards */}
 
                      <div id="cardsDeck">
+                         {this.props.artistsSearch.artists.length && this.props.artistsSearch.searchLength
+                         ?<div>
+
+                         </div>
+                         :<>
                          <Row className="mx-5">
                              <Row id="deckHeader" className="w-100">
 
                                  <div className="mt-4 mb-1">
-                                     <h3>#THROWBACKTHURSDAY</h3>
+                                    <h3>#THROWBACK{this.currentDay().toUpperCase()}</h3>
                                  </div>
 
                             </Row> 
 
                             <Row className="row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 px-5 home-cards">
-                                 {this.state.albums.length?this.state.albums.map((album,i) =>
-                                 {console.log(this.state.albums);
+                                 {
+                                this.state.rockSongs.length && this.state.rockSongs.map((album,i) =>
+                                 {console.log(this.state.popArtists);
                                      return (<Col key={album.album.id} className="col px-0 mb-4">
                                      
                                  <div className="card h-100">
@@ -157,9 +176,8 @@ class Home extends Component {
                                              <h5 className="card-title">{album.artist.name}</h5>
                                          </div>
                                  </div>
-                                 </Col>) } ) 
+                                 </Col>) } )
                                                               
-                                :<p>Error Loading</p>
                                 } 
                                 
 
@@ -171,31 +189,99 @@ class Home extends Component {
                              <Row id="deckHeader" className="w-100">
 
                                  <div className="mt-4 mb-1">
-                                     <h3>#Search Result</h3>
+                                    <h3>#POP CLASSICS</h3>
                                  </div>
 
                             </Row> 
 
                             <Row className="row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 px-5 home-cards">
-                                 {this.state.searchArtist.length?
-    
-                                   (<Col className="col px-0 mb-4">
+                                 {
+                                this.state.popSongs.length && this.state.popSongs.map((album,i) =>
+                                 {console.log(this.state.popSongs);
+                                     return (<Col key={album.album.id} className="col px-0 mb-4">
                                      
-                                         <div className="card h-100">
+                                 <div className="card h-100">
                                          
-                                             <img onClick={()=> this.props.history.push('/artist/' + this.state.searchArtist.artist.name)} src={this.state.searchArtist.artist.picture_medium} className="card-img-top" alt="artistname"/>
+                                             <img onClick={()=> this.props.history.push('/artist/' + album.artist.name)} src={album.artist.picture_medium} className="card-img-top" alt="artistname"/>
                                        
                                          <div className="card-body text-center p-3">
-                                             <h5 className="card-title">{this.state.searchArtist.artist.name}</h5>
+                                             <h5 className="card-title">{album.artist.name}</h5>
                                          </div>
                                  </div>
-                                 </Col>)
+                                 </Col>) } )
                                                               
-                                :<p></p>
                                 } 
                                 
 
                             </Row>
+
+                         </Row>
+
+                       <Row className="mx-5">
+                             <Row id="deckHeader" className="w-100">
+
+                                 <div className="mt-4 mb-1">
+                                    <h3>#HIPHOP CLASSICS</h3>
+                                 </div>
+
+                            </Row> 
+
+                            <Row className="row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-6 px-5 home-cards">
+                                 {
+                                this.state.hipHopSongs.length && this.state.hipHopSongs.map((album,i) =>
+                                 {console.log(this.state.rockArtists);
+                                     return (<Col key={album.album.id} className="col px-0 mb-4">
+                                     
+                                 <div className="card h-100">
+                                         
+                                             <img onClick={()=> this.props.history.push('/artist/' + album.artist.name)} src={album.artist.picture_medium} className="card-img-top" alt="artistname"/>
+                                       
+                                         <div className="card-body text-center p-3">
+                                             <h5 className="card-title">{album.artist.name}</h5>
+                                         </div>
+                                 </div>
+                                 </Col>) } )
+                                                              
+                                } 
+                                
+
+                            </Row>
+
+                         </Row> 
+                         </>
+                         }
+
+                         <Row className="mx-5">
+                              <Row id="deckHeader" className="w-100">
+
+                                 <div className="mt-4 mb-1">
+                                     <h3>#Search Result</h3>
+                                 </div>
+
+                              </Row>
+
+                                <Row>
+                                {
+                                      (this.props.artistsSearch.artists.length && (this.props.artistsSearch.searchLength))
+                                      ?this.props.artistsSearch.artists.map(artist =>
+                                         <Col key={artist.album.id} className="col px-0 mb-4">
+                                          
+                                      <div className="card h-100">
+                                              
+                                                  <img onClick={()=> this.props.history.push('/artist/' + artist.artist.name)} src={artist.artist.picture_medium} className="card-img-top" alt="artistname"/>
+                                            
+                                              <div className="card-body text-center p-3">
+                                                  <h5 className="card-title">{artist.artist.name}</h5>
+                                              </div>
+                                      </div>
+                                      </Col> ) 
+                                      :
+                                          <div >
+                                            <p className="pl-5 ml-5">Search for your favourite artists</p>
+                                          </div>
+                                       
+                                 }
+                                </Row>
 
                          </Row>
 
@@ -213,4 +299,4 @@ class Home extends Component {
     }
 }
 
-export default Home
+export default connect(s=>s)(Home)
