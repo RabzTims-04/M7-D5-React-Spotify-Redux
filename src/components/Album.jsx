@@ -2,7 +2,6 @@ import { Component } from 'react';
 import { Container, Row, Col, Button, Table } from 'react-bootstrap'
 import MyNav from './MyNav'
 import Footer from './Footer'
-import Audio from './Audio'
 import '../css/Album.css'
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
