@@ -1,0 +1,195 @@
+#contentHome{
+    background: linear-gradient(135deg, rgba(38,66,103,1) 20%, rgba(19,19,19,1) 100%);
+    padding-bottom: 200px;
+}
+
+#cardsDeck .card {
+    color: white;
+    background-color: rgba(24, 24, 24, 0);
+    border-color: rgba(24, 24, 24, 0);
+    border-radius: 0.5em;
+    /* z-index: 5; */
+    transform: translateX(0px);  
+    transition: 1s all;
+
+}
+
+/* change card appearance on hover */
+#cardsDeck .card:hover {
+    transform: scale(1.09);
+    /* box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.2); */
+    cursor: pointer;
+    z-index: 3;
+}
+
+
+#queen{
+    transform: translateX(0px);  
+    transition: 1s all;
+}
+
+#queen:hover{
+    transform: scale(1.09);
+    /* box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.2); */
+    cursor: pointer;
+    z-index: 3;
+}
+
+/* heading of cards section  */
+#deckHeader>div>h3 {
+    padding-left: 56px;
+    color: white;
+    font-size: 2em;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+#deckHeader>div>h3:hover {
+    text-decoration: underline;
+}
+
+/* description of cards section  */
+#deckHeader div>span {
+    font-size: 1.25em;
+    color: rgba(255, 255, 255, 0.70);
+}
+/* card img  */
+#cardsDeck .card img {
+    /* border-radius: 5px; */
+    padding: 8px;
+    padding-bottom: 0;
+    /* z-index: 2; */
+}
+
+
+.artist-cards .card:hover::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color:  rgba(0,0,0,0.4);
+}
+
+#cardsDeck .card i{
+    position: absolute;
+    color: rgba(255, 255, 255, 0.702);
+    /* transform: scale(1); */
+    top: 20px;
+    left: 20px;
+    z-index: 5;
+}
+
+
+ /* in card heading (album name) */
+#cardsDeck .card-body h5 {
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 0px;
+    z-index: 3;
+}
+/* in card p (artist name) */
+#cardsDeck .card-body p {
+    font-size: 10px;
+    font-weight: lighter;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.card-play {
+    width: 40px;
+    height: 40px;
+    background-color: #27AE60;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 80px;
+    margin: auto;
+    border-radius: 50%;
+    z-index: 20;
+    transform: scale(0);
+    transition: transform 0.1s;
+}
+
+.card-play::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 4px;
+    margin: auto;
+    border-style: solid;
+    border-width: 7px 0 7px 10px;
+    border-color: transparent transparent transparent white;
+    background-color: transparent;
+}
+
+#contentHome li a{
+    color:rgba(202, 198, 198, 0.73);
+    font-size: 12px;
+    position: relative;
+    letter-spacing: 2px;
+    font-weight: lighter;
+}
+
+#contentHome li a::after{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background-color: #1db954;
+    color: transparent;
+    width: 0%;
+    content: "";
+    height: 3px;
+    transition: all 0.5s;    
+}
+
+#contentHome li a:hover::after{
+    width: 30%;
+}
+
+#contentHome li a:focus{
+    color:white;
+    border: none;
+}
+
+#contentHome li a:hover{
+    color:white;
+    border: none;
+}
+
+#contentHome .nav-tabs{
+    border: none;
+}
+
+#contentHome .nav-tabs .nav-item .active{
+    border: none;
+    background-color: transparent;
+}
+
+@media screen and (max-width: 650px) {
+    #deckHeader {
+        padding: 0px;
+    }
+    #deckHeader>div>h3 {
+        font-size: 1.5em;
+    }
+    
+}
+
+@media screen and (max-width: 550px) {
+    #deckHeader>div>h3 {
+        font-size: 1.3em;
+        letter-spacing: 0px;
+        padding-left: 0px !important;
+        padding-bottom: 15px;
+    }
+}    
